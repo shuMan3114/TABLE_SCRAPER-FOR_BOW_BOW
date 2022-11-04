@@ -36,6 +36,7 @@ class TableScraper:
             # Handler for captions returning None/empty list
             if len(captions):
                 caption = captions[0]
+                # another false safe is use thead -- much easier to sort and eliminate
                 # Removes the "\n" at the end of the caption string
                 stripNewLine = str(caption.getText())[:-1]
             else:
