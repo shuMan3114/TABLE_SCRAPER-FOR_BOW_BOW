@@ -31,22 +31,30 @@ class TableScraper:
         count = 1
         
         for table in tables:
-            # Querying through each table to find all <caption></caption> tags which is conventionally used to assign table title
-            captions = list(table.findAll('caption'))
-            # Handler for captions returning None/empty list
-            if len(captions):
-                caption = captions[0]
-                # another false safe is use thead -- much easier to sort and eliminate
-                # Removes the "\n" at the end of the caption string
-                stripNewLine = str(caption.getText())[:-1]
+            # Querying through each table to find all <caption></caption> tags which is commonly used to assign table title
+            if(table.findAll('th') or table.find('thead')):
+                if(not len(table.findAll('caption'))):
+                    heading = table.find_previous_sibling(re.compile("^h[1-6]$"))
+                    print(heading)
+                    if(heading != None):
+                        cleanCaption = (heading.text)[0:-6]
+                        # print(count,cleanH,sep="\t")
+                    else:
+                        cleanCaption = " "
+                else:
+                    captions = list(table.findAll('caption'))
+                    print(captions)# Handler for captions returning None/empty list
+                    if len(captions):
+                        caption = captions[0]# Removes the "\n" at the end of the caption string
+                        stripNewLine = str(caption.getText())[:-1]
+                    else:
+                        stripNewLine = " " # removes all refrencess like [1],[2] by splitting it and then taking the first one
+                    captionRefSplit = stripNewLine.split("[")
+                    cleanCaption = captionRefSplit[0] # adds to caption dictionary
             else:
-                stripNewLine = " "
-            # removes all refs like [8][9] by splitting it and then taking the first one
-            captionRefSplit = stripNewLine.split("[")
-            cleanCaption = captionRefSplit[0]
-            # adds to caption dictionary
-            captionList[count] = cleanCaption
+                cleanCaption = " "
             count +=1
+            captionList[count] = cleanCaption  
         # assgins tableTitles attribute to object
         self.tableTitles = captionList
     
